@@ -45,11 +45,38 @@ def print_contents():
     ${coffee_machine['money']} of money"""))
 
 
-def buy_coffee():
-    choice = input("What do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino:\n")
-    for ingredient, amount in coffee_types[choice].items():
+def check_stock(coffee_type):
+    for ingredient, amount in coffee_type.items():
+        if abs(amount) > coffee_machine[ingredient]:
+            return False, ingredient
+    return True, None
+
+
+def make_coffee(coffee_type):
+    for ingredient, amount in coffee_type.items():
         coffee_machine[ingredient] += amount
     coffee_machine["cups"] -= 1
+
+
+def buy_coffee():
+    while True:
+        choice = input("What do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino, back - to main menu:\n")
+
+        if choice == "back":
+            return
+        elif choice in coffee_types:
+            break
+        else:
+            print("Invalid choice. Please select a valid option.\n")
+
+    selected_coffee = coffee_types[choice]
+    is_enough_stock, missing_ingredient = check_stock(selected_coffee)
+
+    if not is_enough_stock:
+        print(f"Sorry, not enough {missing_ingredient}!")
+    else:
+        print("I have enough resources, making you a coffee!")
+        make_coffee(selected_coffee)
 
 
 def empty_cash_register():
@@ -58,26 +85,34 @@ def empty_cash_register():
 
 
 def fill_coffee_machine():
-    water = int(input("Write how many ml of water you want to add:\n"))
-    coffee_machine['water'] += water
-    milk = int(input("Write how many ml of milk you want to add:\n"))
-    coffee_machine['milk'] += milk
-    beans = int(input("Write how many grams of coffee beans you want to add:\n"))
-    coffee_machine['beans'] += beans
-    cups = int(input("Write how many disposable cups of coffee you want to add:\n"))
-    coffee_machine['cups'] += cups
+    try:
+        water = int(input("Write how many ml of water you want to add:\n"))
+        coffee_machine['water'] += water
+        milk = int(input("Write how many ml of milk you want to add:\n"))
+        coffee_machine['milk'] += milk
+        beans = int(input("Write how many grams of coffee beans you want to add:\n"))
+        coffee_machine['beans'] += beans
+        cups = int(input("Write how many disposable cups of coffee you want to add:\n"))
+        coffee_machine['cups'] += cups
+    except ValueError:
+        print("The value must be an integer.")
 
 
 if __name__ == "__main__":
-    print_contents()
-    action = input("\nWrite action (buy, fill, take):\n")
+    try:
+        action = input("Write action (buy, fill, take, remaining, exit):\n")
+        print("")
 
-    if action == "take":
-        empty_cash_register()
-    elif action == "fill":
-        fill_coffee_machine()
-    elif action == "buy":
-        buy_coffee()
-
-    print("")
-    print_contents()
+        while action != "exit":
+            if action == "buy":
+                buy_coffee()
+            elif action == "fill":
+                fill_coffee_machine()
+            elif action == "take":
+                empty_cash_register()
+            elif action == "remaining":
+                print_contents()
+            action = input("\nWrite action (buy, fill, take, remaining, exit):\n")
+            print("")
+    except KeyboardInterrupt:
+        print("The program has been interrupted.")
