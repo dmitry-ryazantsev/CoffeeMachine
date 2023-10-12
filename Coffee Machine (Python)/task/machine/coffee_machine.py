@@ -85,17 +85,25 @@ def empty_cash_register():
 
 
 def fill_coffee_machine():
-    try:
-        water = int(input("Write how many ml of water you want to add:\n"))
-        coffee_machine['water'] += water
-        milk = int(input("Write how many ml of milk you want to add:\n"))
-        coffee_machine['milk'] += milk
-        beans = int(input("Write how many grams of coffee beans you want to add:\n"))
-        coffee_machine['beans'] += beans
-        cups = int(input("Write how many disposable cups of coffee you want to add:\n"))
-        coffee_machine['cups'] += cups
-    except ValueError:
-        print("The value must be an integer.")
+    ingredient_prompts = {
+        "water": "Write how many ml of water you want to add:",
+        "milk": "Write how many ml of milk you want to add:",
+        "beans": "Write how many grams of coffee beans you want to add:",
+        "cups": "Write how many disposable cups of coffee you want to add:"
+    }
+
+    ingredients = ["water", "milk", "beans", "cups"]
+    for ingredient in ingredients:
+        while True:
+            try:
+                amount = int(input(ingredient_prompts[ingredient] + "\n"))
+                if amount < 0:
+                    raise ValueError
+                else:
+                    coffee_machine[ingredient] += amount
+                    break
+            except ValueError:
+                print("Invalid input. The value must be a non-negative integer.\n")
 
 
 if __name__ == "__main__":
